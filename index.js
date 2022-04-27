@@ -1,8 +1,26 @@
+const DEFAULT_COLOR = "#000000";
+const DEFAULT_SIZE = 16;
+const DEFAULT_MODE = 'color';
+
 const container = document.getElementById("container");
 const gridsize = document.getElementById("gridsize");
 
+let currentColor = DEFAULT_COLOR;
+let currentSize = DEFAULT_SIZE;
+let currentMode = DEFAULT_MODE;
+
+let mouseDown = false
+document.body.onmousedown = () => (mouseDown = true)
+document.body.onmouseup = () => (mouseDown = false)
+
 function clearBox(elementID) {
     document.getElementById(elementID).innerHTML = "";
+    makeGrid(currentSize);
+}
+
+function eraser() {
+    currentMode = 'erase';
+    currentColor = "#FFFFFF";
 }
 
 function newBox() {
@@ -12,9 +30,22 @@ function newBox() {
     }
     while (isNaN(foo) || foo > 64) {
         foo = prompt("Please insert a number less than 100");
+        if (foo === null) {
+            return;
+        }
     };
+    currentSize = foo;
     clearBox("container")
-    makeGrid(foo);
+}
+
+function changeColor(e) {
+    if (e.type === 'mouseover' && !mouseDown) {
+        return;
+    } else if (currentMode === 'color') {
+        e.target.style.backgroundColor = currentColor;
+    } else if (currentMode === 'erase') {
+        e.target.style.backgroundColor = currentColor;
+    }
 }
 
 function makeGrid(size) {
@@ -23,23 +54,10 @@ function makeGrid(size) {
     for (c = 0; c < (size*size); c++) {
         let cell = document.createElement("div");
         container.appendChild(cell).className = "grid-item";
-        cell.addEventListener('mouseover', e => e.target.classList.add('hover-class'));
+        cell.addEventListener('mouseover', changeColor);
+        cell.addEventListener('mousedown', changeColor);
     };
 };
 
-/*grid.style.gridTemplateColumns = `repeat(${size}, 1fr)`
-  grid.style.gridTemplateRows = `repeat(${size}, 1fr)`
-
- for (let i = 0; i < size * size; i++) {
-    const gridElement = document.createElement('div')
-    gridElement.classList.add("grid-element")
-    gridElement.addEventListener('mouseover', changeColor)
-    gridElement.addEventListener('mousedown', changeColor)
-    c.appendChild(gridElement)
-  }
-
-
-*/
-
-makeGrid(16);
+makeGrid(DEFAULT_SIZE);
 
